@@ -54,6 +54,10 @@ npm run build   # regenerates the userscript and extension/ from src/
 
 Edit the files in `src/`, then build. Commit the generated `immich-paper-sphere-button.user.js` and `extension/` too, so they can be installed without building. Vocabulary is in [`GLOSSARY.md`](GLOSSARY.md).
 
+### Releasing
+
+Bump `version` in `package.json`, run `npm run build`, commit, then push a tag `v<version>`. The [release workflow](.github/workflows/release.yml) tests, packages the extension as a Chrome zip, signs a self-hosted Firefox `.xpi` through Mozilla (unlisted), and attaches both, `updates.json` and the userscript to a GitHub Release. Installed Firefox copies update from `updates.json` on the latest release. It needs the repository secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` from [addons.mozilla.org API keys](https://addons.mozilla.org/developers/addon/api/key/).
+
 To test against a local generator, run `npm run serve` in the generator repo and set the generator URL to that address.
 
 ## License

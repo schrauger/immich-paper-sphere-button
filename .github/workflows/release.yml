@@ -1,0 +1,66 @@
+# On a version tag (v<package.json version>): test, package the extension for Chrome, sign a
+# self-hosted (unlisted) Firefox build, and attach both plus the userscript to a GitHub Release.
+# Needs repository secrets AMO_JWT_ISSUER and AMO_JWT_SECRET (addons.mozilla.org → API keys).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  WEB_EXT: web-ext@10.8.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Test (includes a check that the committed build is current)
+        run: npm test
+
+      - name: Check the tag matches package.json
+        run: node scripts/release.mjs check-tag "$GITHUB_REF_NAME"
+
+      - name: Lint the extension
+        run: npx --yes "$WEB_EXT" lint --source-dir extension
+
+      - name: Asset names
+        id: names
+        run: |
+          echo "chrome=$(node -p 'JSON.parse(process.argv[1]).chrome' "$(node scripts/release.mjs names)")" >> "$GITHUB_OUTPUT"
+          echo "firefox=$(node -p 'JSON.parse(process.argv[1]).firefox' "$(node scripts/release.mjs names)")" >> "$GITHUB_OUTPUT"
+
+      - name: Package for Chrome
+        run: npx --yes "$WEB_EXT" build --source-dir extension --artifacts-dir dist --filename "${{ steps.names.outputs.chrome }}"
+
+      - name: Prepare the self-hosted Firefox build
+        run: |
+          node scripts/release.mjs firefox-unlisted dist
+          npx --yes "$WEB_EXT" lint --self-hosted --source-dir dist/firefox-src
+
+      - name: Sign for Firefox (unlisted)
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx --yes "$WEB_EXT" sign --channel unlisted \
+            --source-dir dist/firefox-src --artifacts-dir dist/signed \
+            --api-key "$AMO_JWT_ISSUER" --api-secret "$AMO_JWT_SECRET"
+          mv dist/signed/*.xpi "dist/${{ steps.names.outputs.firefox }}"
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes \
+            "dist/${{ steps.names.outputs.chrome }}" \
+            "dist/${{ steps.names.outputs.firefox }}" \
+            dist/updates.json \
+            immich-paper-sphere-button.user.js

@@ -48,7 +48,9 @@ test('extension manifest works in Chrome and Firefox and asks for no hosts up fr
   assert.equal(m.background.service_worker, 'background.js');
   assert.deepEqual(m.background.scripts, ['background.js']);
   assert.ok(m.browser_specific_settings.gecko.id);
-  assert.equal(m.browser_specific_settings.gecko.strict_min_version, '128.0');
+  assert.equal(m.browser_specific_settings.gecko.strict_min_version, '140.0');
+  assert.deepEqual(m.browser_specific_settings.gecko.data_collection_permissions, { required: ['none'] });
+  assert.equal(m.browser_specific_settings.gecko.update_url, undefined, 'update_url is added only to the unlisted Firefox build');
   for (const f of [m.background.service_worker, m.options_ui.page]) {
     await readFile(join(root, 'extension', f));
   }
