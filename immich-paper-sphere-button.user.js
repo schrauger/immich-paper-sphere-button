@@ -174,7 +174,8 @@ const button = document.createElement('button');
 button.type = 'button';
 button.textContent = LABEL;
 button.style.cssText = [
-  'position:fixed', 'left:16px', 'bottom:16px', 'z-index:2147483647', 'display:none',
+  'position:fixed', 'left:16px', 'bottom:100px', // clears the viewer's 83 px thumbnail strip
+  'z-index:2147483647', 'display:none',
   'padding:10px 16px', 'border:0', 'border-radius:999px', 'cursor:pointer',
   'font:600 14px/1.2 system-ui,sans-serif', 'color:#fff', 'background:#4250af',
   'box-shadow:0 2px 8px rgba(0,0,0,.4)', 'max-width:calc(100vw - 32px)',

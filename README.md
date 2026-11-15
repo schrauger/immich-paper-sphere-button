@@ -31,7 +31,7 @@ Reload any Immich tabs that were already open.
 
 ## Using it
 
-Open a panorama in Immich and click **Make paper sphere** at the bottom left. A generator tab opens and the photo loads. If your browser blocks the new tab, allow pop-ups for your Immich site.
+Open a panorama in Immich and click **Make paper sphere** at the lower left, just above the thumbnail strip. A generator tab opens and the photo loads. If your browser blocks the new tab, allow pop-ups for your Immich site.
 
 A photo counts as a panorama if Immich lists its projection as equirectangular. If Immich doesn't know the projection, any photo that is exactly twice as wide as it is tall counts too.
 
