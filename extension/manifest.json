@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Immich paper sphere button",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Adds a \"Make paper sphere\" button to panoramas in Immich that opens the paper sphere generator with the photo loaded.",
   "permissions": ["storage", "scripting"],
   "optional_host_permissions": ["*://*/*"],

@@ -31,7 +31,15 @@ function apiQuery(share) {
 
 /** A panorama is an equirectangular image; with no projection known, an exactly 2:1 image counts. */
 function isPanorama(asset) {
-  if (asset?.type !== 'IMAGE') return false;
+  return asset?.type === 'IMAGE' && isEquirectangular(asset);
+}
+
+/** A panorama video: the same test as a panorama, for a video. */
+function isPanoramaVideo(asset) {
+  return asset?.type === 'VIDEO' && isEquirectangular(asset);
+}
+
+function isEquirectangular(asset) {
   const projection = asset.exifInfo?.projectionType;
   if (projection) return projection.toUpperCase() === 'EQUIRECTANGULAR';
   const w = asset.width ?? asset.exifInfo?.exifImageWidth;
@@ -83,6 +91,54 @@ function immichOrigin(input) {
 /** The generator address that asks it to wait for a handoff. */
 function handoffUrl(generatorUrl) {
   return generatorUrl.replace(/#.*$/, '') + '#from-opener';
+}
+
+// --- Panorama videos: opened by share link (docs/adr/0002) ---
+
+const SHARE_LINK_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * An existing share link the generator can stream this video from: it shows only this video,
+ * allows downloads, has no password, and has at least a day left.
+ */
+function reusableShareLink(links, assetId, now) {
+  if (!Array.isArray(links)) return undefined;
+  return links.find((l) =>
+    l.type === 'INDIVIDUAL' && l.allowDownload && !l.password && l.key &&
+    l.assets?.length === 1 && l.assets[0].id === assetId &&
+    (!l.expiresAt || Date.parse(l.expiresAt) > now + DAY_MS));
+}
+
+/** The body for POST /api/shared-links. Metadata (location, camera) stays hidden. */
+function newShareLinkBody(assetId, now) {
+  return {
+    type: 'INDIVIDUAL', assetIds: [assetId], allowDownload: true, showMetadata: false,
+    expiresAt: new Date(now + SHARE_LINK_DAYS * DAY_MS).toISOString(),
+  };
+}
+
+/** The Immich page for one asset inside a share, which tells the generator which asset to load. */
+function shareAssetUrl(origin, share, assetId) {
+  const base = share.key ? `/share/${encodeURIComponent(share.key)}` : `/s/${encodeURIComponent(share.slug)}`;
+  return `${origin}${base}/photos/${assetId}`;
+}
+
+/** The generator address that streams from a share link. */
+function streamUrl(generatorUrl, shareUrl) {
+  const url = new URL(generatorUrl);
+  url.hash = '';
+  url.searchParams.set('url', shareUrl);
+  return url.href;
+}
+
+/** Reuse a matching share link of the video, or create one. `api` does same-origin JSON calls. */
+async function findOrCreateShareLink({ api, assetId, now }) {
+  const existing = reusableShareLink(await api.get('/api/shared-links').catch(() => null), assetId, now);
+  if (existing) return existing;
+  const created = await api.post('/api/shared-links', newShareLinkBody(assetId, now));
+  if (!created?.key) throw new Error('Immich returned no share key');
+  return created;
 }
 
 /** Only the tab this click opened, at the configured generator origin, may ask for the photo. */

@@ -1,5 +1,7 @@
 # Hand the panorama over with postMessage, not a share link
 
+This still applies to photos. Panorama videos are opened by share link instead: see [ADR 0002](0002-panorama-videos-open-by-share-link.md).
+
 The button needs to get a panorama that is visible in an Immich tab into the generator, which runs on a different origin. We considered having the button create a temporary Immich share link and open the generator with it, so that the generator downloads the photo itself. We chose a different approach. The button downloads the photo inside the Immich tab, using the access that tab already has (the login session, or the share key on a share page). It then opens the generator tab and passes it the bytes as a Blob with `postMessage`.
 
 ## Considered options

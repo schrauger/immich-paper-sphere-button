@@ -5,6 +5,7 @@ Adds a **Make paper sphere** button to [Immich](https://immich.app) while you vi
 - The photo goes straight from your Immich tab to the generator tab in your browser. Nothing is uploaded, and no share link is created ([why](docs/adr/0001-handoff-by-postmessage-not-share-links.md)).
 - It works on your own library, in albums, and on Immich share pages. If a share doesn't allow downloads, a reduced-size copy is sent, and the button says so.
 - HEIC, RAW and other formats browsers can't open are sent as Immich's full-size JPEG.
+- It also works on 360° videos, but differently: the generator streams the video from an Immich share link, so your Immich has to allow it ([below](#videos)).
 
 It comes in two forms built from the same code: a **userscript** and a **browser extension** for Chrome and Firefox. Use whichever you prefer.
 
@@ -33,7 +34,16 @@ Reload any Immich tabs that were already open.
 
 Open a panorama in Immich and click **Make paper sphere** at the lower left, just above the thumbnail strip. A generator tab opens and the photo loads. If your browser blocks the new tab, allow pop-ups for your Immich site.
 
-A photo counts as a panorama if Immich lists its projection as equirectangular. If Immich doesn't know the projection, any photo that is exactly twice as wide as it is tall counts too.
+A photo counts as a panorama if Immich lists its projection as equirectangular. If Immich doesn't know the projection, any photo that is exactly twice as wide as it is tall counts too. Videos are checked the same way.
+
+### Videos
+
+A 360° video is too large to hand over between tabs ([why](docs/adr/0002-panorama-videos-open-by-share-link.md)). Instead, the generator streams it from an Immich share link, and you pick the frame to print there.
+
+- **Logged in:** the button asks first, then reuses a share link that shows only this video, or creates one that allows downloads, hides metadata and expires in 7 days. Anyone with the link can view and download the video until then. You can delete it under *Sharing → Shared links*. If Immich won't create the link, the button explains how to make one yourself and paste it into the generator.
+- **On a share page:** the button opens that share in the generator and creates nothing. If the share doesn't allow downloads, the generator gets Immich's lower-resolution playback version.
+
+Your Immich server has to allow the generator's site to load from it (CORS). Without that, the generator can't read the video. The [generator's README](https://github.com/schrauger/360-paper-sphere-generator#web-app) shows the nginx setup.
 
 ## Development
 
