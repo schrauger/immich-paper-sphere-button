@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immich paper sphere button</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 16px; }
+  label { display: block; font-weight: 600; margin-top: 1.25rem; }
+  input { display: block; width: 100%; box-sizing: border-box; padding: .5rem; font: inherit; margin-top: .25rem; }
+  .hint { font-size: 13px; opacity: .75; margin: .25rem 0 0; }
+  button { margin-top: 1.5rem; padding: .5rem 1.25rem; font: inherit; cursor: pointer; }
+  #status { margin-top: 1rem; min-height: 1.5em; }
+  #status.error { color: #c62828; }
+</style>
+</head>
+<body>
+<h1>Immich paper sphere button</h1>
+<p>Shows a “Make paper sphere” button while you view a panorama in Immich. Clicking it opens the paper sphere generator with that photo loaded.</p>
+
+<label for="immichHost">Immich host</label>
+<input id="immichHost" type="url" placeholder="https://photos.example.org" autocomplete="off">
+<p class="hint">The address you open Immich at. Saving asks your browser for permission to run on that site only.</p>
+
+<label for="generatorUrl">Generator URL</label>
+<input id="generatorUrl" type="url" autocomplete="off">
+<p class="hint">Leave blank for the public generator.</p>
+
+<button id="save" type="button">Save</button>
+<p id="status" role="status"></p>
+
+<script src="options.js"></script>
+</body>
+</html>

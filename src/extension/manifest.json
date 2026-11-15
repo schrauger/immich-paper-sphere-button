@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Immich paper sphere button",
+  "version": "{{version}}",
+  "description": "Adds a \"Make paper sphere\" button to panoramas in Immich that opens the paper sphere generator with the photo loaded.",
+  "permissions": ["storage", "scripting"],
+  "optional_host_permissions": ["*://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Immich paper sphere button: settings"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "immich-paper-sphere-button@schrauger.github.io",
+      "strict_min_version": "128.0"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+// ==UserScript==
+// @name         Immich paper sphere button
+// @namespace    https://github.com/schrauger/immich-paper-sphere-button
+// @version      {{version}}
+// @description  Adds a "Make paper sphere" button to panoramas in Immich that opens the paper sphere generator with the photo loaded.
+// @license      AGPL-3.0-only
+// @match        https://immich.example.com/*
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_registerMenuCommand
+// @run-at       document-idle
+// @noframes
+// @updateURL    {{rawUrl}}
+// @downloadURL  {{rawUrl}}
+// ==/UserScript==
